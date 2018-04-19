@@ -36,6 +36,11 @@ precedencegroup SectionPrecedence {
     higherThan: FormPrecedence
 }
 
+precedencegroup ComparePrecedence {
+    associativity: left
+    higherThan: SectionPrecedence
+}
+
 infix operator +++ : FormPrecedence
 
 /**
@@ -125,6 +130,40 @@ public func <<< (left: Section, right: BaseRow) -> Section {
     return left
 }
 
+
+/**
+ Appends a rows to a section.
+ 
+ - parameter left:  the section
+ - parameter right: the rows to be appended
+ 
+ - returns: the section
+ */
+@discardableResult
+public func <<< (left: Section, right: [BaseRow]) -> Section {
+    right.forEach {
+        left.append($0)
+    }
+    return left
+}
+
+/**
+ Appends a rows to a section.
+ 
+ - parameter left:  the section
+ - parameter right: the row (optional) to be appended
+ 
+ - returns: the section
+ */
+@discardableResult
+public func <<< (left: Section, right: BaseRow?) -> Section {
+    guard let right = right else {
+        return left
+    }
+    left.append(right)
+    return left
+}
+
 /**
  Creates a section with two rows
  
@@ -138,6 +177,17 @@ public func <<< (left: BaseRow, right: BaseRow) -> Section {
     let section = Section()
     section <<< left <<< right
     return section
+}
+
+infix operator &&& : ComparePrecedence
+
+@discardableResult
+public func &&& (left: Bool, right: BaseRow) -> BaseRow? {
+    if left {
+        return nil
+    } else {
+        return right
+    }
 }
 
 /**
